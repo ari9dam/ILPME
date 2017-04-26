@@ -6,11 +6,13 @@ package ilpme.entities;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import xhail.core.statements.Example;
+import ilpme.xhail.core.statements.Example;
 
 /**
  * @author Arindam
- *
+ * The data structure to hold an annotated sample 
+ * in the training data.
+ * The training data is a collection of such samples.
  */
 public class Sample {
 	/**
@@ -81,6 +83,4 @@ public class Sample {
 		negativeExamples = new LinkedHashSet<Example>();
 		story = new LinkedHashSet<String>();
 	}
-	
-	
 }
