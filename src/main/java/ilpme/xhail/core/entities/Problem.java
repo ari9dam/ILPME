@@ -22,9 +22,9 @@ import java.util.TreeSet;
 import org.apache.commons.lang3.StringUtils;
 
 import ilpme.xhail.core.Buildable;
-import ilpme.xhail.core.Config;
+import ilpme.core.Config;
 import ilpme.xhail.core.Dialler;
-import ilpme.xhail.core.Logger;
+import ilpme.core.Logger;
 import ilpme.xhail.core.Utils;
 import ilpme.xhail.core.parser.InputStates;
 import ilpme.xhail.core.parser.Parser;

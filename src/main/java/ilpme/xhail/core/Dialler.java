@@ -15,6 +15,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 
+import ilpme.core.Config;
+import ilpme.core.Logger;
 import ilpme.xhail.core.entities.Grounding;
 import ilpme.xhail.core.entities.Problem;
 import ilpme.xhail.core.entities.Solvable;

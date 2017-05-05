@@ -11,6 +11,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import ilpme.core.Logger;
 import ilpme.xhail.core.entities.Grounding;
 import ilpme.xhail.core.entities.Problem;
 import ilpme.xhail.core.statements.Display;

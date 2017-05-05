@@ -1,15 +1,17 @@
 /**
  * 
  */
-package ilpme.xhail.core;
+package ilpme.core;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.LinkedHashSet;
+
+import ilpme.xhail.core.Buildable;
 
 /**
- * @author stefano
+ * @author Stephano
+ * @author Arindam Mitra
  *
  */
 public class Config {
@@ -30,23 +32,45 @@ public class Config {
 		private boolean output = false;
 		private boolean prettify = false;
 		private boolean search = false;
-		private LinkedHashSet<Path> sources = new LinkedHashSet<>();
+		
 		private boolean terminate = false;
+		private Path source = null;
+		public void setClasp(Path clasp) {
+			this.clasp = clasp;
+		}
+
+		public void setErrors(String errors) {
+			this.errors = errors;
+		}
+
+		public void setGringo(Path gringo) {
+			this.gringo = gringo;
+		}
+
+		public void setIterations(int iterations) {
+			this.iterations = iterations;
+		}
+
+		public void setKill(long kill) {
+			this.kill = kill;
+		}
+
+
+		public Builder setSource(String trainingData) {
+			if (null == trainingData)
+				throw new IllegalArgumentException("Illegal 'trainingData' argument in Application.Builder.addSource(Path): " + trainingData);
+			Path temp = Paths.get(trainingData);
+			if (Files.exists(temp) && !Files.isDirectory(temp))
+				this.source = temp;
+			else if (Files.isReadable(temp))
+				errors += String.format("  file '%s' cannot be accessed\n", trainingData);
+			else
+				errors += String.format("  unknown argument '%s'\n", trainingData);
+			return this;
+		}
 
 		private boolean version = false;
 
-		public Builder addSource(String source) {
-			if (null == source)
-				throw new IllegalArgumentException("Illegal 'source' argument in Application.Builder.addSource(Path): " + source);
-			Path temp = Paths.get(source);
-			if (Files.exists(temp) && !Files.isDirectory(temp))
-				sources.add(temp);
-			else if (Files.isReadable(temp))
-				errors += String.format("  file '%s' cannot be accessed\n", source);
-			else
-				errors += String.format("  unknown argument '%s'\n", source);
-			return this;
-		}
 
 		@Override
 		public Config build() {
@@ -55,22 +79,12 @@ public class Config {
 			return new Config(this);
 		}
 
-		public Builder clearSources() {
-			sources.clear();
-			return this;
-		}
 
 		public Builder missingParameter() {
 			errors += "  a parameter is missing on the command line\n";
 			return this;
 		}
 
-		public Builder removeSource(String source) {
-			if (null == source)
-				throw new IllegalArgumentException("Illegal 'source' argument in Application.Builder.removeSource(Path): " + source);
-			sources.remove(Paths.get(source));
-			return this;
-		}
 
 		public Builder setAll(boolean all) {
 			this.all = all;
@@ -189,7 +203,7 @@ public class Config {
 
 	private final boolean search;
 
-	private final Path[] sources;
+	private Path source = null;
 
 	private final boolean terminate;
 
@@ -207,25 +221,30 @@ public class Config {
 		this.iterations = builder.iterations;
 		this.help = builder.help;
 		this.kill = builder.kill;
-		String name = "stdin";
-		if (builder.sources.size() > 0) {
-			name = builder.sources.iterator().next().getFileName().toString();
+		String name="stdin";
+		if (builder.source != null) {
+			name = builder.source.getFileName().toString();
 			int pos = name.lastIndexOf(".");
 			if (pos > -1)
 				name = name.substring(0, pos);
 			if (name.isEmpty())
 				name = "file";
 		}
+		
 		this.mute = builder.mute;
 		this.name = name;
 		this.output = builder.output;
 		this.prettify = builder.prettify;
 		this.search = builder.search;
-		this.sources = builder.sources.toArray(new Path[builder.sources.size()]);
 		this.terminate = builder.terminate;
 		this.version = builder.version;
+		this.source = builder.source;
 	}
-
+	
+	public Path getSource() {
+		return this.source;
+	}
+	
 	public Path getClasp() {
 		return clasp;
 	}
@@ -246,12 +265,8 @@ public class Config {
 		return name;
 	}
 
-	public final Path[] getSources() {
-		return sources;
-	}
-
-	public final boolean hasSources() {
-		return sources.length > 0;
+	public final boolean hasSource() {
+		return this.source==null;
 	}
 
 	public final boolean isAll() {
@@ -305,6 +320,10 @@ public class Config {
 	public void setGringo(Path gringo) {
 		this.gringo = gringo;
 	}
+	
+	public void setSource(Path source){
+		this.source = source;
+	}
 
 	@Override
 	public String toString() {
@@ -335,9 +354,14 @@ public class Config {
 			result += " -s";
 		if (version)
 			result += " -v";
-		for (Path file : sources)
-			result += " " + file.toString();
+		result += " " + source.toString();
+			
 		return result;
+	}
+
+	public boolean hasError() {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 }

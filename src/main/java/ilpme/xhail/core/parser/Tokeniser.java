@@ -6,7 +6,7 @@ package ilpme.xhail.core.parser;
 import java.io.IOException;
 import java.io.InputStream;
 
-import ilpme.xhail.core.Logger;
+import ilpme.core.Logger;
 
 /**
  * @author stefano

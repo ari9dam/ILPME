@@ -15,7 +15,7 @@ import java.util.Set;
 import org.apache.commons.collections4.iterators.ArrayIterator;
 
 import ilpme.xhail.core.Buildable;
-import ilpme.xhail.core.Config;
+import ilpme.core.Config;
 import ilpme.xhail.core.parser.Parser;
 import ilpme.xhail.core.statements.Display;
 import ilpme.xhail.core.statements.Example;

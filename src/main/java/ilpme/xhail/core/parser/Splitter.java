@@ -9,7 +9,7 @@ import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import ilpme.xhail.core.Logger;
+import ilpme.core.Logger;
 
 /**
  * @author stefano

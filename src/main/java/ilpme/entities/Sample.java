@@ -3,10 +3,18 @@
  */
 package ilpme.entities;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
-
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.nio.file.Path;
+import java.util.LinkedList;
+import java.util.List;
 import ilpme.xhail.core.statements.Example;
+import ilpme.xhail.core.parser.InputStates;
+import ilpme.xhail.core.parser.Splitter;
+import ilpme.core.Logger;
+import ilpme.xhail.core.parser.Parser;
+import ilpme.xhail.core.statements.Display;
 
 /**
  * @author Arindam
@@ -15,72 +23,82 @@ import ilpme.xhail.core.statements.Example;
  * The training data is a collection of such samples.
  */
 public class Sample {
-	/**
-	 * The set of positive examples
-	 */
-	private Set<Example> positiveExamples;
 	
-	/**
-	 * The set of positive examples
+	/***
+	 * The properties of a Sample Observation
 	 */
-	private Set<Example> negativeExamples;
+	private List<String> story;
+
+	private List<Display> displays ;
+
+	private List<String> domains ;
+
+	private List<Example> examples ;
 	
-	/**
-	 * The story (observation) from which conclusions aer drawn
-	 */
-	private Set<String> story;
-
-	/**
-	 * @return the positiveExamples
-	 */
-	public Set<Example> getPositiveExamples() {
-		return positiveExamples;
+	
+	public Sample(Path source){
+		/**
+		 * Read from file 
+		 * categorize and add to bucket
+		 */
+		this.story  = new LinkedList<String>() ;
+		this.displays = new LinkedList<Display>() ;
+		this.domains = new LinkedList<String>();
+		this.examples = new LinkedList<Example>();		
+		parse(source);
+	}
+	
+	public void addBackground(String statement) {
+		if (null != statement) {
+			statement = statement.trim();
+			if (statement.startsWith("#compute"))
+				Logger.warning(false, "'#compute' statements are not supported and will be ignored");
+			else if (statement.startsWith("#hide"))
+				Logger.warning(false, "'#hide' statements are not supported and will be ignored");
+			else if (statement.startsWith("#show"))
+				Logger.warning(false, "'#show' statements are not supported and will be ignored");
+			else if (statement.startsWith("#display") && statement.endsWith("."))
+				addDisplay(Parser.parseDisplay(statement.substring("#display".length(), statement.length() - 1).trim()));
+			else if (statement.startsWith("#example") && statement.endsWith("."))
+				addExample(Parser.parseExample(statement.substring("#example".length(), statement.length() - 1).trim()));
+			else if (statement.startsWith("#modeb") && statement.endsWith("."))
+				Logger.warning(false, "'#modeb' statements are not supported in sample files and will be ignored");
+			else if (statement.startsWith("#modeh") && statement.endsWith("."))
+				Logger.warning(false, "'#modeh' statements are not supported in sample files and will be ignored");
+			else if (statement.startsWith("#domain"))
+				domains.add(statement);
+			else
+				story.add(statement);
+		}
+	}
+	
+	public void addDisplay(Display display) {
+		if (null == display)
+			throw new IllegalArgumentException("Illegal 'display' argument in Problem.Builder.addDisplay(Display): " + display);
+		this.displays.add(display);
 	}
 
-	/**
-	 * @param positiveExamples the positiveExamples to set
-	 */
-	public void setPositiveExamples(Set<Example> positiveExamples) {
-		this.positiveExamples = positiveExamples;
+	public void addExample(Example example) {
+		if (null != example)
+			examples.add(example);
+	}
+	
+	public void parse(InputStream stream) {
+		if (null == stream)
+			throw new IllegalArgumentException("Illegal 'stream' argument in Problem.Builder.parse(InputStream): " + stream);
+		for (String statement : new Splitter(InputStates.INITIAL).parse(stream))
+			addBackground(statement);
 	}
 
-	/**
-	 * @return the negativeExamples
-	 */
-	public Set<Example> getNegativeExamples() {
-		return negativeExamples;
+	public void parse(Path path) {
+		if (null == path)
+			throw new IllegalArgumentException("Illegal 'path' argument in Problem.Builder.parse(Path): " + path);
+		try {
+			parse(new FileInputStream(path.toFile()));
+		} catch (FileNotFoundException e) {
+			Logger.error("cannot find file '" + path.getFileName().toString() + "'");
+		}
+		
 	}
-
-	/**
-	 * @param negativeExamples the negativeExamples to set
-	 */
-	public void setNegativeExamples(Set<Example> negativeExamples) {
-		this.negativeExamples = negativeExamples;
-	}
-
-	/**
-	 * @return the story
-	 */
-	public Set<String> getStory() {
-		return story;
-	}
-
-	/**
-	 * @param story the story to set
-	 */
-	public void setStory(Set<String> story) {
-		this.story = story;
-	}
-
-	public Sample(Set<Example> positiveExamples, Set<Example> negativeExamples, Set<String> story) {
-		this.positiveExamples = positiveExamples;
-		this.negativeExamples = negativeExamples;
-		this.story = story;
-	}
-
-	public Sample() {
-		positiveExamples = new LinkedHashSet<Example>();
-		negativeExamples = new LinkedHashSet<Example>();
-		story = new LinkedHashSet<String>();
-	}
+	
 }

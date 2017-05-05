@@ -10,7 +10,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import ilpme.xhail.core.Logger;
+import ilpme.core.Logger;
 import ilpme.xhail.core.entities.Values;
 import ilpme.xhail.core.parser.Parser.ParserErrorException;
 

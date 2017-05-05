@@ -1,7 +1,7 @@
 /**
  * 
  */
-package ilpme.xhail.core;
+package ilpme.core;
 
 import java.nio.file.Path;
 import java.util.HashSet;
@@ -10,6 +10,8 @@ import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 
+import ilpme.entities.LogicProgram;
+import ilpme.xhail.core.Dialler;
 import ilpme.xhail.core.entities.Answer;
 import ilpme.xhail.core.entities.Answers;
 
@@ -67,8 +69,8 @@ public class Logger {
 			System.out.print(" -k " + config.getKill());
 		if (config.isMute())
 			System.out.print(" -m");
-		for (Path source : config.getSources())
-			System.out.print(" " + source);
+
+		System.out.print(" " + config.getSource());
 		System.out.println();
 		System.out.println();
 	}
@@ -130,6 +132,12 @@ public class Logger {
 		if (!config.isBlind())
 			System.out.print(ANSI_RED);
 		System.out.println(label);
+	}
+
+
+	public static void stamp(LogicProgram answer) {
+		// TODO Auto-generated method stub
+
 	}
 
 	public static void stamp(Answers answers) {
@@ -217,8 +225,7 @@ public class Logger {
 		System.out.println();
 		System.out.println(SIGNATURE + " " + VERSION);
 		System.out.println();
-		System.out.println("Copyright (c) Stefano Bragaglia");
-		System.out.println("Copyright (c) Oliver Ray");
+		System.out.println("Copyright (c) Arindam Mitra");
 		System.out.println();
 		System.out.println("GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>");
 		System.out.println(String.format("'%s' is free software: you are free to change and redistribute it.", SIGNATURE));
@@ -237,5 +244,6 @@ public class Logger {
 
 	private Logger() {
 	}
+
 
 }

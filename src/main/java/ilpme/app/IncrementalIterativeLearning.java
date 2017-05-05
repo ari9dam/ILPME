@@ -14,7 +14,7 @@ public class IncrementalIterativeLearning {
 	
 	public LogicProgram learn(ILPMEProblem problem){
 		
-		int numberOfSamples = problem.trainingData.size();
+		int numberOfSamples = problem.getTrainingData().size();
 		PartialHypotheis best = null;
 		
 		while(this.pool.hasNext()){

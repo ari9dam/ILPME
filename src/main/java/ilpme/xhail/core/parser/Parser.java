@@ -8,7 +8,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import ilpme.xhail.core.Logger;
+import ilpme.core.Logger;
 import ilpme.xhail.core.statements.Display;
 import ilpme.xhail.core.statements.Example;
 import ilpme.xhail.core.statements.ModeB;
