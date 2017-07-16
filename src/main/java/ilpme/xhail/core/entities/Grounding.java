@@ -16,7 +16,7 @@ import java.util.TreeSet;
 import org.apache.commons.lang3.StringUtils;
 
 import ilpme.xhail.core.Buildable;
-import ilpme.core.Config;
+import ilpme.xhail.core.Config;
 import ilpme.xhail.core.Dialler;
 import ilpme.core.Logger;
 import ilpme.xhail.core.Utils;
@@ -161,7 +161,7 @@ public class Grounding implements Solvable {
 		this.facts = builder.facts;
 		this.model = builder.model.toArray(new Atom[builder.model.size()]);
 		this.problem = builder.problem;
-		this.table = SchemeTerm.lookup(builder.problem.getModeHs(), builder.problem.getModeBs(), builder.facts);
+		this.table = SchemeTerm.lookup(builder.problem.getModeHs(), builder.problem.getAllModeBs(), builder.facts);
 		this.uncovered = builder.uncovered.toArray(new Literal[builder.uncovered.size()]);
 	}
 
@@ -329,14 +329,17 @@ public class Grounding implements Solvable {
 				Map<Term, Variable> map = new HashMap<>();
 				Clause.Builder builder = new Clause.Builder();
 				Atom atom = clause.getHead();
+				ModeH modeh = null;
 				for (ModeH mode : problem.getModeHs()) {
 					Scheme scheme = mode.getScheme();
-					if (SchemeTerm.subsumes(scheme, atom, facts))
+					if (SchemeTerm.subsumes(scheme, atom, facts)){
 						builder.setHead((Atom) scheme.generalises(atom, map));
+						modeh = mode;
+					}
 				}
 				for (Literal literal : clause.getBody()) {
 					atom = literal.getAtom();
-					for (ModeB mode : problem.getModeBs()) {
+					for (ModeB mode : problem.getModeBs(modeh)) {
 						Scheme scheme = mode.getScheme();
 						if (SchemeTerm.subsumes(scheme, atom, facts))
 							builder.addLiteral(new Literal.Builder((Atom) scheme.generalises(atom, map)).setNegated(literal.isNegated())
@@ -368,7 +371,7 @@ public class Grounding implements Solvable {
 							Set<Term> next = new HashSet<Term>();
 							while (!usables.isEmpty()) {
 								level += 1;
-								for (ModeB mode : problem.getModeBs()) {
+								for (ModeB mode : problem.getModeBs(head)) {
 									scheme = mode.getScheme();
 									if (mode.isNegated()) {
 										Map<Atom, Collection<Term>> found = SchemeTerm.generateAndOutput(scheme, usables, table, facts);
@@ -403,7 +406,7 @@ public class Grounding implements Solvable {
 	}
 
 	public final ModeB[] getModeBs() {
-		return problem.getModeBs();
+		return problem.getAllModeBs();
 	}
 
 	public final ModeH[] getModeHs() {

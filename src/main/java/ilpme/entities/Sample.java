@@ -100,5 +100,21 @@ public class Sample {
 		}
 		
 	}
+
+	public List<String> getStory() {
+		return story;
+	}
+
+	public List<Display> getDisplays() {
+		return displays;
+	}
+
+	public List<String> getDomains() {
+		return domains;
+	}
+
+	public List<Example> getExamples() {
+		return examples;
+	}
 	
 }

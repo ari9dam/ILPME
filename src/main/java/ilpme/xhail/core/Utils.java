@@ -55,7 +55,7 @@ public class Utils {
 				printer.println("%% M. Modes");
 				for (ModeH mode : problem.getModeHs())
 					printer.println(mode);
-				for (ModeB mode : problem.getModeBs())
+				for (ModeB mode : problem.getAllModeBs())
 					printer.println(mode);
 				printer.println();
 			}

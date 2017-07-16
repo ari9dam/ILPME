@@ -10,13 +10,12 @@ import java.nio.file.Paths;
 import ilpme.xhail.core.Buildable;
 
 /**
- * @author Stephano
- * @author Arindam Mitra
+ *  * @author Arindam Mitra
  *
  */
-public class Config {
+public class ILPMEConfig {
 
-	public static class Builder implements Buildable<Config> {
+	public static class Builder implements Buildable<ILPMEConfig> {
 
 		private boolean all = false;
 		private boolean blind = false;
@@ -73,10 +72,10 @@ public class Config {
 
 
 		@Override
-		public Config build() {
+		public ILPMEConfig build() {
 			if (!errors.isEmpty())
 				Logger.error("errors found:\n" + errors);
-			return new Config(this);
+			return new ILPMEConfig(this);
 		}
 
 
@@ -209,7 +208,7 @@ public class Config {
 
 	private final boolean version;
 
-	private Config(Builder builder) {
+	private ILPMEConfig(Builder builder) {
 		if (null == builder)
 			throw new IllegalArgumentException("Illegal 'builder' argument in Application(Application.Builder): " + builder);
 		this.all = builder.all;

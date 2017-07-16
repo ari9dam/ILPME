@@ -21,7 +21,7 @@ public class Clause implements Iterable<Literal> {
 
 	public static class Builder implements Buildable<Clause> {
 
-		private Set<Literal> body = new LinkedHashSet<>();
+		private Set<Literal> body = new LinkedHashSet<Literal>();
 
 		private Atom head = null;
 

@@ -11,11 +11,15 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import ilpme.app.IIterativeSolver;
 import ilpme.app.IncrementalIterativeLearning;
-import ilpme.core.Config;
+import ilpme.app.TopDownIterativeSolver;
+import ilpme.core.ILPMEConfig;
 import ilpme.core.Logger;
 import ilpme.entities.ILPMEProblem;
 import ilpme.entities.LogicProgram;
+import ilpme.utils.IPartialHypothesisPool;
+import ilpme.utils.PartialHypotheisQueue;
 import ilpme.xhail.core.entities.Answers;
 
 /**
@@ -45,7 +49,7 @@ public class Application implements Callable<LogicProgram> {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		Config.Builder builder = new Config.Builder();
+		ILPMEConfig.Builder builder = new ILPMEConfig.Builder();
 		if (null == args)
 			builder.missingParameter();
 		else
@@ -100,14 +104,14 @@ public class Application implements Callable<LogicProgram> {
 				}
 
 		
-		Config config = builder.build();
+		ILPMEConfig config = builder.build();
 		Application application = new Application(config);
 		application.execute();
 	}
 
-	private Config config = null;
+	private ILPMEConfig config = null;
 	private ILPMEProblem problem = null;
-	private Application(Config config) {
+	private Application(ILPMEConfig config) {
 		if (null == config)
 			throw new IllegalArgumentException("Illegal 'config' argument in Application(Config): " + config);
 
@@ -122,7 +126,10 @@ public class Application implements Callable<LogicProgram> {
 		/**
 		 * create the problem object here
 		 */
-		IncrementalIterativeLearning iil = new IncrementalIterativeLearning();
+		this.problem = new ILPMEProblem(config);
+		IPartialHypothesisPool queue = new PartialHypotheisQueue();
+		IIterativeSolver iterSolver = new TopDownIterativeSolver();
+		IncrementalIterativeLearning iil = new IncrementalIterativeLearning(queue, iterSolver);
 		return iil.learn(problem);
 	}
 

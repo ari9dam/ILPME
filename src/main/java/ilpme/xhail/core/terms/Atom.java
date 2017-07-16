@@ -141,6 +141,14 @@ public class Atom implements Term, Iterable<Atom>, Comparable<Atom> {
 			return this;
 		}
 
+		public boolean setTerm(int pos, Term newId) {
+			if(this.terms.size()<=pos)
+				return false;
+			this.terms.set(pos, newId);
+			return true;
+			
+		}
+
 	}
 
 	private final String identifier;

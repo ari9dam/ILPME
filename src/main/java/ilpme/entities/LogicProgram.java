@@ -1,24 +1,35 @@
 package ilpme.entities;
 
-import java.util.HashSet;
-import java.util.Set;
-
+import java.util.ArrayList;
 import ilpme.xhail.core.terms.Clause;
 
 public class LogicProgram {
-	private Set<Clause> program;
+	private ArrayList<Clause> program;
 
 	public LogicProgram() {
-		this.program = new HashSet<Clause>();
+		this.program = new ArrayList<Clause>();
 	}
 	
+	/***
+	 * appends q to p
+	 * should maintain the order
+	 * @param p
+	 * @param q
+	 */
 	public LogicProgram(LogicProgram p, LogicProgram q) {
-		this.program = new HashSet<Clause>();
+		this.program = new ArrayList<Clause>();
 		this.program.addAll(p.getRules());
 		this.program.addAll(q.getRules());
 	}
 	
-	private Set<Clause> getRules() {
+	public LogicProgram(Clause[] generalization) {
+		this.program = new ArrayList<Clause>();
+		for(Clause rule : generalization){
+			this.program.add(rule);
+		}
+	}
+
+	public ArrayList<Clause> getRules() {
 		return this.program;
 	}
 
@@ -27,4 +38,36 @@ public class LogicProgram {
 			this.program.add(rule);
 		}
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((program == null) ? 0 : program.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		LogicProgram other = (LogicProgram) obj;
+		if (program == null) {
+			if (other.program != null)
+				return false;
+		} else if (!program.equals(other.program))
+			return false;
+		return true;
+	}
+
+	public int length() {
+		// TODO Auto-generated method stub
+		return this.program.size();
+	}
+	
+	
 }

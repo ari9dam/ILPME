@@ -1,4 +1,12 @@
 package ilpme.entities;
+
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
+import ilpme.xhail.core.terms.Atom;
+import ilpme.xhail.core.terms.Clause;
+
 /**
  * 
  * @author Arindam
@@ -7,27 +15,47 @@ package ilpme.entities;
  * Each partial hypothesis can be refined
  */
 public class PartialHypotheis {
-	private int index;  //The solution to the problems E{1}...E{index}
-	private LogicProgram top; //the root of the partial hypothesis
-	private LogicProgram bottom; //the root of the partial hypothesis
+	private int index;  //covers the examples  E{1}...E{index}
+	private LogicProgram generalization; //the root of the partial hypothesis
+	private LogicProgram inductiveForm; //the root of the partial hypothesis
+	private Set<Atom> literals;
 	
+	public PartialHypotheis() {
+		super();
+	}
+	
+	public PartialHypotheis(Clause[] generalization, Atom[] literals) {
+		this.generalization = new LogicProgram(generalization);
+		this.literals = new HashSet<Atom>();
+		this.literals.addAll(Arrays.asList(literals));
+	}
+
 	public int getIndex() {
 		return index;
 	}
 	public void setIndex(int index) {
 		this.index = index;
 	}
-	public LogicProgram getTop() {
-		return top;
+	public LogicProgram getGeneralization() {
+		return generalization;
 	}
-	public void setTop(LogicProgram top) {
-		this.top = top;
+	public void setGeneralization(LogicProgram generalization) {
+		this.generalization = generalization;
 	}
-	public LogicProgram getBottom() {
-		return bottom;
+	public LogicProgram getInductiveForm() {
+		return inductiveForm;
 	}
-	public void setBottom(LogicProgram bottom) {
-		this.bottom = bottom;
+	public void setInductiveForm(LogicProgram inductiveForm) {
+		this.inductiveForm = inductiveForm;
 	}
-		
+	public Set<Atom> getLiterals() {
+		return literals;
+	}
+	public void setLiterals(Set<Atom> literals) {
+		this.literals = literals;
+	}
+
+	public LogicProgram getHypothesis() {
+		return null;
+	}
 }

@@ -11,6 +11,7 @@ import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 
 import ilpme.entities.LogicProgram;
+import ilpme.xhail.core.Config;
 import ilpme.xhail.core.Dialler;
 import ilpme.xhail.core.entities.Answer;
 import ilpme.xhail.core.entities.Answers;
@@ -49,7 +50,7 @@ public class Logger {
 		}
 	}
 
-	public static void found(Config config) {
+	public static void found(ILPMEConfig config) {
 		if (null == config)
 			throw new IllegalArgumentException("Illegal 'application' argument in Logger.found(Config): " + config);
 		Path gringo = config.getGringo();
@@ -78,7 +79,7 @@ public class Logger {
 	/**
 	 * Prints a header message.
 	 */
-	public static void header(Config config) {
+	public static void header(ILPMEConfig config) {
 		if (null == config)
 			throw new IllegalArgumentException("Illegal 'config' argument in Logger.header(Config): " + config);
 		if (!config.isBlind())

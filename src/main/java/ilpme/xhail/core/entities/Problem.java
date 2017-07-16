@@ -15,6 +15,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -22,9 +23,10 @@ import java.util.TreeSet;
 import org.apache.commons.lang3.StringUtils;
 
 import ilpme.xhail.core.Buildable;
-import ilpme.core.Config;
+import ilpme.xhail.core.Config;
 import ilpme.xhail.core.Dialler;
 import ilpme.core.Logger;
+import ilpme.entities.ModeDeclarations;
 import ilpme.xhail.core.Utils;
 import ilpme.xhail.core.parser.InputStates;
 import ilpme.xhail.core.parser.Parser;
@@ -58,9 +60,8 @@ public class Problem implements Solvable {
 
 		private Map<String, Set<Integer>> lookup = new HashMap<>();
 
-		private Set<ModeB> modeBs = new LinkedHashSet<>();
+		private ModeDeclarations modeDeclarations = null;
 
-		private Set<ModeH> modeHs = new LinkedHashSet<>();
 
 		public Builder(Config config) {
 			if (null == config)
@@ -81,15 +82,16 @@ public class Problem implements Solvable {
 					addDisplay(Parser.parseDisplay(statement.substring("#display".length(), statement.length() - 1).trim()));
 				else if (statement.startsWith("#example") && statement.endsWith("."))
 					addExample(Parser.parseExample(statement.substring("#example".length(), statement.length() - 1).trim()));
-				else if (statement.startsWith("#modeb") && statement.endsWith("."))
-					addMode(Parser.parseModeB(statement.substring("#modeb".length(), statement.length() - 1).trim()));
-				else if (statement.startsWith("#modeh") && statement.endsWith("."))
-					addMode(Parser.parseModeH(statement.substring("#modeh".length(), statement.length() - 1).trim()));
 				else if (statement.startsWith("#domain"))
 					domains.add(statement);
 				else
 					background.add(statement);
 			}
+			return this;
+		}
+
+		public Builder addBackground(List<String> statements) {
+			background.addAll(statements);
 			return this;
 		}
 
@@ -106,17 +108,6 @@ public class Problem implements Solvable {
 			return this;
 		}
 
-		public Builder addMode(ModeB mode) {
-			if (null != mode)
-				modeBs.add(mode);
-			return this;
-		}
-
-		public Builder addMode(ModeH mode) {
-			if (null != mode)
-				modeHs.add(mode);
-			return this;
-		}
 
 		@Override
 		public Problem build() {
@@ -138,8 +129,7 @@ public class Problem implements Solvable {
 			this.displays.clear();
 			this.examples.clear();
 			this.lookup.clear();
-			this.modeBs.clear();
-			this.modeHs.clear();
+			this.modeDeclarations = null;
 			return this;
 		}
 
@@ -155,12 +145,12 @@ public class Problem implements Solvable {
 		}
 
 		public Builder clearModeBs() {
-			this.modeBs.clear();
+			this.modeDeclarations = null;
 			return this;
 		}
 
 		public Builder clearModeHs() {
-			this.modeHs.clear();
+			this.modeDeclarations = null;
 			return this;
 		}
 
@@ -203,15 +193,10 @@ public class Problem implements Solvable {
 					return false;
 			} else if (!lookup.equals(other.lookup))
 				return false;
-			if (modeBs == null) {
-				if (other.modeBs != null)
+			if (modeDeclarations == null) {
+				if (other.modeDeclarations != null)
 					return false;
-			} else if (!modeBs.equals(other.modeBs))
-				return false;
-			if (modeHs == null) {
-				if (other.modeHs != null)
-					return false;
-			} else if (!modeHs.equals(other.modeHs))
+			} else if (!modeDeclarations.equals(other.modeDeclarations))
 				return false;
 			return true;
 		}
@@ -226,8 +211,7 @@ public class Problem implements Solvable {
 			result = prime * result + ((domains == null) ? 0 : domains.hashCode());
 			result = prime * result + ((examples == null) ? 0 : examples.hashCode());
 			result = prime * result + ((lookup == null) ? 0 : lookup.hashCode());
-			result = prime * result + ((modeBs == null) ? 0 : modeBs.hashCode());
-			result = prime * result + ((modeHs == null) ? 0 : modeHs.hashCode());
+			result = prime * result + ((modeDeclarations == null) ? 0 : modeDeclarations.hashCode());
 			return result;
 		}
 
@@ -260,11 +244,7 @@ public class Problem implements Solvable {
 					removeDisplay(Parser.parseDisplay(statement.substring("#display".length(), statement.length() - 1).trim()));
 				} else if (statement.startsWith("#example") && statement.endsWith(".")) {
 					removeExample(Parser.parseExample(statement.substring("#example".length(), statement.length() - 1).trim()));
-				} else if (statement.startsWith("#modeb") && statement.endsWith(".")) {
-					removeMode(Parser.parseModeB(statement.substring("#modeb".length(), statement.length() - 1).trim()));
-				} else if (statement.startsWith("#modeh") && statement.endsWith(".")) {
-					removeMode(Parser.parseModeH(statement.substring("#modeh".length(), statement.length() - 1).trim()));
-				} else if (statement.startsWith("#domain")) {
+				}else if (statement.startsWith("#domain")) {
 					domains.remove(statement);
 				} else
 					background.remove(statement);
@@ -285,18 +265,6 @@ public class Problem implements Solvable {
 			return this;
 		}
 
-		public Builder removeMode(ModeB mode) {
-			if (null != mode)
-				modeBs.remove(mode);
-			return this;
-		}
-
-		public Builder removeMode(ModeH mode) {
-			if (null != mode)
-				modeHs.remove(mode);
-			return this;
-		}
-
 	}
 
 	private final String[] background;
@@ -311,9 +279,7 @@ public class Problem implements Solvable {
 
 	private final Map<String, Set<Integer>> lookup;
 
-	private final ModeB[] modeBs;
-
-	private final ModeH[] modeHs;
+	private final ModeDeclarations modeDeclarations;
 
 	private Set<String> refinements = new HashSet<>();
 
@@ -326,8 +292,7 @@ public class Problem implements Solvable {
 		this.domains = builder.domains.toArray(new String[builder.domains.size()]);
 		this.examples = builder.examples.toArray(new Example[builder.examples.size()]);
 		this.lookup = builder.lookup;
-		this.modeBs = builder.modeBs.toArray(new ModeB[builder.modeBs.size()]);
-		this.modeHs = builder.modeHs.toArray(new ModeH[builder.modeHs.size()]);
+		this.modeDeclarations = builder.modeDeclarations;
 	}
 
 	@Override
@@ -357,9 +322,12 @@ public class Problem implements Solvable {
 				return false;
 		} else if (!lookup.equals(other.lookup))
 			return false;
-		if (!Arrays.equals(modeBs, other.modeBs))
-			return false;
-		if (!Arrays.equals(modeHs, other.modeHs))
+
+		if (modeDeclarations == null) {
+			if (other.modeDeclarations != null)
+				return false;
+		}
+		if (!modeDeclarations.equals(other.modeDeclarations))
 			return false;
 		if (refinements == null) {
 			if (other.refinements != null)
@@ -401,14 +369,14 @@ public class Problem implements Solvable {
 			result.add(String.format("#show %s/%d.", display.getIdentifier(), display.getArity()));
 		for (Example example : examples)
 			result.add(String.format("#show %s/%d.", example.getAtom().getIdentifier(), example.getAtom().getArity()));
-		for (ModeH mode : modeHs) {
+		for (ModeH mode : this.modeDeclarations.getAllModeHs()) {
 			Scheme scheme = mode.getScheme();
 			result.add(String.format("#show %s/%d.", scheme.getIdentifier(), scheme.getArity()));
 			result.add(String.format("#show abduced_%s/%d.", scheme.getIdentifier(), scheme.getArity()));
 			for (Placemarker placemarker : scheme.getPlacemarkers())
 				result.add(String.format("#show %s/1.", placemarker.getIdentifier()));
 		}
-		for (ModeB mode : modeBs) {
+		for (ModeB mode : this.modeDeclarations.getAllModeBs()) {
 			Scheme scheme = mode.getScheme();
 			result.add(String.format("#show %s/%d.", scheme.getIdentifier(), scheme.getArity()));
 			for (Placemarker placemarker : scheme.getPlacemarkers())
@@ -417,12 +385,16 @@ public class Problem implements Solvable {
 		return result;
 	}
 
-	public final ModeB[] getModeBs() {
-		return modeBs;
+	public final ModeB[] getModeBs(ModeH key) {
+		return this.modeDeclarations.getModebsForModeh(key);
 	}
 
 	public final ModeH[] getModeHs() {
-		return modeHs;
+		return this.modeDeclarations.getAllModeHs();
+	}
+	
+	public final ModeB[] getAllModeBs() {
+		return this.modeDeclarations.getAllModeBs();
 	}
 
 	public final Collection<String> getRefinements() {
@@ -455,14 +427,13 @@ public class Problem implements Solvable {
 		result = prime * result + Arrays.hashCode(domains);
 		result = prime * result + Arrays.hashCode(examples);
 		result = prime * result + ((lookup == null) ? 0 : lookup.hashCode());
-		result = prime * result + Arrays.hashCode(modeBs);
-		result = prime * result + Arrays.hashCode(modeHs);
+		result = prime * result +((this.modeDeclarations == null) ? 0 : modeDeclarations.hashCode());
 		result = prime * result + ((refinements == null) ? 0 : refinements.hashCode());
 		return result;
 	}
 
 	public final boolean hasModes() {
-		return modeBs.length > 0 || modeHs.length > 0;
+		return modeDeclarations.getAllModeHs().length>0;
 	}
 
 	public final boolean lookup(Atom atom) {
@@ -487,7 +458,51 @@ public class Problem implements Solvable {
 
 	public final Answers solve() {
 		Answers.Builder builder = new Answers.Builder(config);
-		if (background.length > 0 || examples.length > 0 || modeHs.length > 0 || modeBs.length > 0) {
+		if (background.length > 0 || examples.length > 0 || hasModes()) {
+			int iter = 0;
+			Set<Collection<Clause>> generalisations = new HashSet<>();
+			while (!builder.isMeaningful() && iter <= config.getIterations()) {
+				if (config.isDebug())
+					Utils.saveTemp(this, iter, Paths.get(String.format("%s_abd%d.lp", config.getName(), iter)));
+
+				int iit = 0;
+				Values values = new Values();
+				Dialler dialler = new Dialler.Builder(config, this).build();
+				Map.Entry<Values, Collection<Collection<String>>> entry = Answers.timeAbduction(iter, dialler);
+				for (Collection<String> output : entry.getValue()) {
+					if (builder.size() > 0 && config.isTerminate())
+						break;
+					Grounding grounding = Answers.timeDeduction(this, output);
+					if (config.isDebug()) {
+						Logger.message(String.format("*** Info  (%s): found Delta: %s", Logger.SIGNATURE, StringUtils.join(grounding.getDelta(), " ")));
+						Logger.message(String.format("*** Info  (%s): found Kernel: %s", Logger.SIGNATURE, StringUtils.join(grounding.getKernel(), " ")));
+						Logger.message(String.format("*** Info  (%s): found Generalisation: %s", Logger.SIGNATURE, StringUtils.join(grounding.getGeneralisation(), " ")));
+						if (grounding.needsInduction())
+							Utils.saveTemp(grounding, iter, Paths.get(String.format("%s_abd%d_ind%d.lp", config.getName(), iter, iit++)));
+					}
+					Set<Clause> generalisation = new HashSet<Clause>();
+					Collections.addAll(generalisation, grounding.getGeneralisation());
+					if (!generalisations.contains(generalisation)) {
+						values = grounding.solve(values, builder);
+						// always add refinements, hopefully it won't be used!
+						refinements.add(grounding.asBadSolution());
+						generalisations.add(generalisation);
+					}
+					count = builder.size();
+				}
+				iter += 1;
+			}
+			if (builder.size() > 0 && config.isTerminate())
+				System.out.println(String.format("*** Info  (%s): search for hypotheses terminated after the first match", Logger.SIGNATURE));
+			if (!builder.isMeaningful())
+				System.out.println(String.format("*** Info  (%s): no meaningful answers, try more iterations (--iter,-i <num>)", Logger.SIGNATURE));
+		}
+		return builder.build();
+	}
+	
+	public final Answers findGeneralizations() {
+		Answers.Builder builder = new Answers.Builder(config);
+		if (background.length > 0 || examples.length > 0 || hasModes()) {
 			int iter = 0;
 			Set<Collection<Clause>> generalisations = new HashSet<>();
 			while (!builder.isMeaningful() && iter <= config.getIterations()) {
@@ -532,8 +547,8 @@ public class Problem implements Solvable {
 	@Override
 	public String toString() {
 		return "Problem [\n  background=" + Arrays.toString(background) + ",\n  config=" + config + ",\n  displays=" + Arrays.toString(displays)
-				+ ",\n  domains=" + Arrays.toString(domains) + ",\n  examples=" + Arrays.toString(examples) + ",\n  modeBs=" + Arrays.toString(modeBs)
-				+ ",\n  modeHs=" + Arrays.toString(modeHs) + "\n]";
+		+ ",\n  domains=" + Arrays.toString(domains) + ",\n  examples=" + Arrays.toString(examples) + ",\n  modeBs=" + Arrays.toString(modeDeclarations.getAllModeBs())
+		+ ",\n  modeHs=" + Arrays.toString(modeDeclarations.getAllModeHs()) + "\n]";
 	}
 
 }

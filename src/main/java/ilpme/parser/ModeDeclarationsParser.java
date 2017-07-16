@@ -49,8 +49,7 @@ public class ModeDeclarationsParser {
 			
 		} catch (FileNotFoundException e) {
 			Logger.error("cannot find file '" + src.getFileName().toString() + "'");
-		}
-		
+		}		
 		return declarations;
 	}
 }

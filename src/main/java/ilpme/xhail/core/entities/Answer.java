@@ -89,6 +89,10 @@ public class Answer {
 			return grounding.getCovered();
 		return hypothesis.getCovered();
 	}
+	
+	public final Clause[] getGeneralisation(){
+		return grounding.getGeneralisation();
+	}
 
 	public final Atom[] getDelta() {
 		return grounding.getDelta();

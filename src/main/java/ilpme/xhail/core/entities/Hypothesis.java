@@ -15,7 +15,7 @@ import java.util.Set;
 import org.apache.commons.collections4.iterators.ArrayIterator;
 
 import ilpme.xhail.core.Buildable;
-import ilpme.core.Config;
+import ilpme.xhail.core.Config;
 import ilpme.xhail.core.parser.Parser;
 import ilpme.xhail.core.statements.Display;
 import ilpme.xhail.core.statements.Example;
@@ -341,6 +341,10 @@ public class Hypothesis implements Iterable<Atom> {
 		return "Hypothesis [\n  hypotheses=" + Arrays.toString(hypotheses) + ",\n  covered=" + Arrays.toString(covered) + ",\n  grounding=" + grounding
 				+ ",\n  literals=" + Arrays.toString(literals) + ",\n  model=" + Arrays.toString(model) + ",\n  uncovered=" + Arrays.toString(uncovered)
 				+ "\n]";
+	}
+	
+	public Atom[] getLiterals() {
+		return literals;
 	}
 
 }
