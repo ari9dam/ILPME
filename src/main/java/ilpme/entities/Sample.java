@@ -9,6 +9,9 @@ import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.LinkedList;
 import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
+
 import ilpme.xhail.core.statements.Example;
 import ilpme.xhail.core.parser.InputStates;
 import ilpme.xhail.core.parser.Splitter;
@@ -35,6 +38,8 @@ public class Sample {
 
 	private List<Example> examples ;
 	
+	private String name="NONAME";
+	
 	
 	public Sample(Path source){
 		/**
@@ -45,6 +50,7 @@ public class Sample {
 		this.displays = new LinkedList<Display>() ;
 		this.domains = new LinkedList<String>();
 		this.examples = new LinkedList<Example>();		
+		this.name = source.getFileName().toString();
 		parse(source);
 	}
 	
@@ -115,6 +121,35 @@ public class Sample {
 
 	public List<Example> getExamples() {
 		return examples;
+	}
+
+	public String toASPString() {
+		String obs = "%story\n "+ StringUtils.join(this.story,"\n")+"\n%examples\n";
+		for (Example example :this.getExamples())
+			for (String statement : example.asClauses())
+				obs+=statement+"\n";
+		return obs;
+	}
+	
+	public String toASPStringForSatisfiability() {
+		String obs = "%story\n "+ StringUtils.join(this.story,"\n")+"\n%examples\n";
+		for (Example example :this.getExamples())
+			obs+=example.asClauses()[2]+"\n";
+		return obs;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	@Override
+	public String toString() {
+		return "Sample [ name=" + name+", story=" + story + ", displays=" + displays + ", domains=" + domains + ", examples=" + examples
+				 + "]";
 	}
 	
 }

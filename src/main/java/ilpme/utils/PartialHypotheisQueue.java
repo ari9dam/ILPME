@@ -1,21 +1,20 @@
 package ilpme.utils;
 
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
+import java.util.Stack;
 
 import ilpme.entities.PartialHypotheis;
 
 public class PartialHypotheisQueue implements IPartialHypothesisPool{
-	List<PartialHypotheis> queue;
+	Stack<PartialHypotheis> queue;
 	
 	
 	public PartialHypotheisQueue(){
-		this.queue = new LinkedList<PartialHypotheis>();
+		this.queue = new Stack<PartialHypotheis>();
 	}
 
 	public PartialHypotheis getNext(){
-		return null;
+		return this.queue.pop();
 	}
 	
 	public void addAll(Set<PartialHypotheis> refinements){
@@ -24,6 +23,16 @@ public class PartialHypotheisQueue implements IPartialHypothesisPool{
 
 	public boolean hasNext() {
 		
-		return queue.isEmpty();
+		return !queue.isEmpty();
+	}
+
+	
+	public void add(PartialHypotheis ph) {
+		this.queue.push(ph);
+	}
+
+	@Override
+	public int size() {
+		return this.queue.size();
 	}
 }

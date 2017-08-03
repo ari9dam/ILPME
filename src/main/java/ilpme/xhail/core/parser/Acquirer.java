@@ -96,7 +96,7 @@ public class Acquirer {
 		if (SATISFIABLE.equals(token)) {
 			parseSATISFIABLE();
 			answers.add(atoms);
-		} else {
+		}else {
 			parseOPTIMIZATION();
 			parseValues();
 		}

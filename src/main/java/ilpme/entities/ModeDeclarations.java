@@ -42,16 +42,16 @@ public class ModeDeclarations {
 	
 	
 	private ModeDeclarations(Map<ModeH,List<ModeB>> modes){
-		this.modeHs = (ModeH[]) modes.keySet().toArray();
+		this.modeHs = modes.keySet().toArray(new ModeH[modes.keySet().size()]);
 		this.modeDeclarations = new HashMap<ModeH,ModeB[]>();
 		
 		Set<ModeB> allmodebs = new HashSet<ModeB>();
 		for(Entry<ModeH, List<ModeB>> entry: modes.entrySet()){
-			ModeB[] modebs = (ModeB[]) entry.getValue().toArray();
+			ModeB[] modebs = entry.getValue().toArray(new ModeB[0]);
 			modeDeclarations.put(entry.getKey(), modebs);
 			allmodebs.addAll(entry.getValue());
 		}
-		this.modeBs = (ModeB[]) allmodebs.toArray();
+		this.modeBs =  allmodebs.toArray(new ModeB[0]);
 	}
 
 	public ModeB[] getModebsForModeh(ModeH key){

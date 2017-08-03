@@ -265,6 +265,12 @@ public class Problem implements Solvable {
 			return this;
 		}
 
+		public Builder setModeDeclarations(ModeDeclarations modeDeclarations) {
+			this.modeDeclarations = modeDeclarations;
+			return this;
+			
+		}
+
 	}
 
 	private final String[] background;
@@ -392,7 +398,7 @@ public class Problem implements Solvable {
 	public final ModeH[] getModeHs() {
 		return this.modeDeclarations.getAllModeHs();
 	}
-	
+
 	public final ModeB[] getAllModeBs() {
 		return this.modeDeclarations.getAllModeBs();
 	}
@@ -499,49 +505,40 @@ public class Problem implements Solvable {
 		}
 		return builder.build();
 	}
-	
-	public final Answers findGeneralizations() {
+
+	public final Set<Collection<Clause>> findGeneralizations() {
 		Answers.Builder builder = new Answers.Builder(config);
+		Set<Collection<Clause>> generalisations = new HashSet<>();
 		if (background.length > 0 || examples.length > 0 || hasModes()) {
 			int iter = 0;
-			Set<Collection<Clause>> generalisations = new HashSet<>();
+			
 			while (!builder.isMeaningful() && iter <= config.getIterations()) {
 				if (config.isDebug())
 					Utils.saveTemp(this, iter, Paths.get(String.format("%s_abd%d.lp", config.getName(), iter)));
 
-				int iit = 0;
-				Values values = new Values();
 				Dialler dialler = new Dialler.Builder(config, this).build();
 				Map.Entry<Values, Collection<Collection<String>>> entry = Answers.timeAbduction(iter, dialler);
 				for (Collection<String> output : entry.getValue()) {
-					if (builder.size() > 0 && config.isTerminate())
-						break;
+
 					Grounding grounding = Answers.timeDeduction(this, output);
 					if (config.isDebug()) {
 						Logger.message(String.format("*** Info  (%s): found Delta: %s", Logger.SIGNATURE, StringUtils.join(grounding.getDelta(), " ")));
 						Logger.message(String.format("*** Info  (%s): found Kernel: %s", Logger.SIGNATURE, StringUtils.join(grounding.getKernel(), " ")));
 						Logger.message(String.format("*** Info  (%s): found Generalisation: %s", Logger.SIGNATURE, StringUtils.join(grounding.getGeneralisation(), " ")));
-						if (grounding.needsInduction())
-							Utils.saveTemp(grounding, iter, Paths.get(String.format("%s_abd%d_ind%d.lp", config.getName(), iter, iit++)));
 					}
 					Set<Clause> generalisation = new HashSet<Clause>();
 					Collections.addAll(generalisation, grounding.getGeneralisation());
 					if (!generalisations.contains(generalisation)) {
-						values = grounding.solve(values, builder);
-						// always add refinements, hopefully it won't be used!
-						refinements.add(grounding.asBadSolution());
-						generalisations.add(generalisation);
+						if (grounding.needsInduction())
+							generalisations.add(generalisation);
 					}
-					count = builder.size();
+					
 				}
 				iter += 1;
 			}
-			if (builder.size() > 0 && config.isTerminate())
-				System.out.println(String.format("*** Info  (%s): search for hypotheses terminated after the first match", Logger.SIGNATURE));
-			if (!builder.isMeaningful())
-				System.out.println(String.format("*** Info  (%s): no meaningful answers, try more iterations (--iter,-i <num>)", Logger.SIGNATURE));
+			
 		}
-		return builder.build();
+		return generalisations;
 	}
 
 	@Override

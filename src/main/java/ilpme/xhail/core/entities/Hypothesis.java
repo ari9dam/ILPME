@@ -224,11 +224,19 @@ public class Hypothesis implements Iterable<Atom> {
 			for (Atom atom : literals) {
 				int clauseId = ((Number) atom.getTerm(0)).getValue();
 				int literalId = ((Number) atom.getTerm(1)).getValue();
+				Set<Literal> literals = types.get(clauseId);
+				Atom head = generalisation[clauseId].getHead();
+				for (Variable variable : head.getVariables())
+					literals.add(new Literal.Builder( //
+							new Atom.Builder(variable.getType().getIdentifier()).
+							addTerm(variable).build() //
+					).build());
+				
 				if (literalId > 0 && 0 <= clauseId && clauseId < generalisation.length) {
 
 					Literal literal = generalisation[clauseId].getBody(literalId);
 					builders.get(clauseId).addLiteral(literal);
-					Set<Literal> literals = types.get(clauseId);
+					
 					for (Variable variable : literal.getVariables())
 						literals.add(new Literal.Builder( //
 								new Atom.Builder(variable.getType().getIdentifier()).addTerm(variable).build() //

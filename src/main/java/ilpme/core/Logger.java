@@ -137,8 +137,7 @@ public class Logger {
 
 
 	public static void stamp(LogicProgram answer) {
-		// TODO Auto-generated method stub
-
+		System.out.println(StringUtils.join(answer.getRules(),'\n'));
 	}
 
 	public static void stamp(Answers answers) {

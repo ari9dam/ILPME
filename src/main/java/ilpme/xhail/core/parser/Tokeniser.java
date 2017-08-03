@@ -140,8 +140,10 @@ public class Tokeniser {
 
 	public String next() {
 		boolean finished = false;
+		
 		while (!finished)
 			finished = state.process(this);
+		
 		return token;
 	}
 
@@ -153,7 +155,7 @@ public class Tokeniser {
 		} catch (IOException e) {
 			Logger.error("cannot read for the input stream");
 			return -1;
-		}
+		} 
 	}
 
 	private void setState(State next) {

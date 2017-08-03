@@ -1,7 +1,10 @@
 package ilpme.utils;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
@@ -15,23 +18,27 @@ import ilpme.xhail.core.terms.Number;
 
 public class PartialHypothesisUtils {
 	public PartialHypotheis mergePartialHypothesis(PartialHypotheis h1, PartialHypotheis h2){
-		PartialHypotheis h = new PartialHypotheis(), big = h1, small = h2;
+		PartialHypotheis h = new PartialHypotheis(0);
 		
-		if(h1.getGeneralization().length()<h2.getGeneralization().length()){
-			big = h2;
-			small = h1;
+		List<Clause> merged = new LinkedList<Clause>();
+		merged.addAll(h1.getGeneralization().getRules());
+		for(Clause cl: h2.getGeneralization().getRules()){
+			if(h2.getLiterals().isEmpty()&& !merged.contains(cl)){
+				merged.add(cl);
+			}
 		}
 		
-		LogicProgram generalization = new LogicProgram(big.getGeneralization(), small.getGeneralization());
+		LogicProgram generalization = new LogicProgram(merged);
+		
 		
 		/**
 		 * merger literals
 		 */
 		Set<Atom> literals = new HashSet<Atom>();
-		literals.addAll(big.getLiterals());
-		int offset = big.getGeneralization().length();
+		literals.addAll(h1.getLiterals());
+		int offset = h1.getGeneralization().length();
 		
-		for(Atom lit: small.getLiterals()){
+		for(Atom lit: h2.getLiterals()){
 			Atom.Builder builder = new Atom.Builder(lit);
 			Number newId = (new Number.Builder(((Number) lit.getTerm(0)).getValue()+offset)).build();
 			builder.setTerm(0,newId);
@@ -41,35 +48,46 @@ public class PartialHypothesisUtils {
 		h.setGeneralization(generalization);
 		h.setLiterals(literals);
 		h.setIndex(h1.getIndex());
+		h.setCoverage(h1.getCoverage());
+		h.setSamples(h1.getSamples());
+		h.setIndex(h1.getIndex());
 		return h;
 	}
 	
-	public String[] asClauses(Clause[] clauses, Set<Atom> selectedLiterals) {
+	public List<String> asClauses(ArrayList<Clause> arrayList, Set<Atom> selectedLiterals, Integer selectionLimit) {
 		Set<String> result = new LinkedHashSet<>();
-		if (clauses.length > 0) {
+		if (arrayList.size() > 0) {
+			result.add("#hide.");
+			result.add("#show use_clause_literal/2.");
+			
 			result.add("use_clause_literal(V1,V2):-selected_use_clause_literal(V1,V2).");
 			
-			result.add("{ use_clause_literal(V1,0) }:-clause(V1), not selected_use_clause_literal(V1,0).");
+			result.add("{ use_clause_literal(V1,0) } 4 :-clause(V1), not selected_use_clause_literal(V1,0).");
 			
 			for(Atom atom: selectedLiterals){
-				result.add("selected_"+ atom.toString());
+				result.add("selected_"+ atom.toString()+".");
 			}
 			
-			boolean hasLiterals = false;
-			for (int clauseId = 0; !hasLiterals && clauseId < clauses.length; clauseId++)
-				hasLiterals = clauses[clauseId].getBody().length > 0;
 			
-			if (hasLiterals)
-				result.add("{ use_clause_literal(V1,V2) }:-clause(V1),literal(V1,V2), not selected_use_clause_literal(V1,V2).");
-
-			for (int clauseId = 0; clauseId < clauses.length; clauseId++) {
-				result.add(String.format("%% %s", clauses[clauseId]));
-				Literal[] literals = clauses[clauseId].getBody();
+			
+			boolean hasLiterals = false;
+			for (int clauseId = 0; !hasLiterals && clauseId < arrayList.size(); clauseId++)
+				hasLiterals = arrayList.get(clauseId).getBody().length > 0;
+			
+			if (hasLiterals&& selectionLimit==null)
+				result.add("{ use_clause_literal(V1,V2) } 8:-clause(V1),literal(V1,V2), not selected_use_clause_literal(V1,V2).");
+			else if(hasLiterals){
+				result.add("0 { use_clause_literal(V1,V2) }"+selectionLimit
+						+" :-clause(V1),literal(V1,V2), not selected_use_clause_literal(V1,V2).");
+			}
+			for (int clauseId = 0; clauseId < arrayList.size(); clauseId++) {
+				result.add(String.format("%% %s", arrayList.get(clauseId)));
+				Literal[] literals = arrayList.get(clauseId).getBody();
 				result.add(String.format("clause(%d).", clauseId));
 				for (int literalId = 1; literalId <= literals.length; literalId++)
 					result.add(String.format("literal(%d,%d).", clauseId, literalId));
 
-				for (int level = 0; level < clauses[clauseId].getLevels(); level++)
+				for (int level = 0; level < arrayList.get(clauseId).getLevels(); level++)
 					result.add(String.format(":-not clause_level(%d,%d),clause_level(%d,%d).", clauseId, level, clauseId, 1 + level));
 
 				result.add(String.format("clause_level(%d,0):-use_clause_literal(%d,0).", clauseId, clauseId));
@@ -77,7 +95,7 @@ public class PartialHypothesisUtils {
 					result.add(String.format("clause_level(%d,%d):-use_clause_literal(%d,%d).", clauseId, literals[literalId - 1].getLevel(), clauseId,
 							literalId));
 
-				Atom head = clauses[clauseId].getHead();
+				Atom head = arrayList.get(clauseId).getHead();
 				result.add(String.format("#minimize[ use_clause_literal(%d,0) =%d @%d ].", clauseId, head.getWeight(), head.getPriority()));
 
 				for (int literalId = 1; literalId <= literals.length; literalId++)
@@ -109,6 +127,6 @@ public class PartialHypothesisUtils {
 
 			}
 		}
-		return result.toArray(new String[result.size()]);
+		return new LinkedList<String>(result);
 	}
 }

@@ -59,9 +59,9 @@ public class ILPMEConfig {
 			if (null == trainingData)
 				throw new IllegalArgumentException("Illegal 'trainingData' argument in Application.Builder.addSource(Path): " + trainingData);
 			Path temp = Paths.get(trainingData);
-			if (Files.exists(temp) && !Files.isDirectory(temp))
+			if (Files.exists(temp) && Files.isDirectory(temp))
 				this.source = temp;
-			else if (Files.isReadable(temp))
+			else if (!Files.isReadable(temp))
 				errors += String.format("  file '%s' cannot be accessed\n", trainingData);
 			else
 				errors += String.format("  unknown argument '%s'\n", trainingData);
@@ -69,6 +69,7 @@ public class ILPMEConfig {
 		}
 
 		private boolean version = false;
+		private Integer maxLength = null;
 
 
 		@Override
@@ -172,6 +173,15 @@ public class ILPMEConfig {
 			return this;
 		}
 
+		public Builder setMaxLength(String string) {
+			try {
+				this.maxLength = Integer.parseUnsignedInt(string);
+			} catch (NullPointerException | NumberFormatException e) {
+				errors += String.format("  '%s' is not a valid number of max length\n", string);
+			}
+			return this;
+		}
+
 	}
 
 	private final boolean all;
@@ -207,6 +217,8 @@ public class ILPMEConfig {
 	private final boolean terminate;
 
 	private final boolean version;
+	
+	private final Integer maxLength;
 
 	private ILPMEConfig(Builder builder) {
 		if (null == builder)
@@ -220,6 +232,7 @@ public class ILPMEConfig {
 		this.iterations = builder.iterations;
 		this.help = builder.help;
 		this.kill = builder.kill;
+		this.maxLength = builder.maxLength;
 		String name="stdin";
 		if (builder.source != null) {
 			name = builder.source.getFileName().toString();
@@ -361,6 +374,10 @@ public class ILPMEConfig {
 	public boolean hasError() {
 		// TODO Auto-generated method stub
 		return false;
+	}
+
+	public Integer getMaxLength() {
+		return maxLength;
 	}
 
 }

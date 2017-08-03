@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -24,6 +25,7 @@ public class ILPMEProblem {
 		this.config = config;
 		this.modeDeclarations = null;
 		this.background = new LinkedList<String>();
+		this.trainingData = new ArrayList<Sample>();
 		ModeDeclarationsParser modeParser = new ModeDeclarationsParser();
 		ModeDeclarations.Builder builder = new ModeDeclarations.Builder();
 		Path src = config.getSource();

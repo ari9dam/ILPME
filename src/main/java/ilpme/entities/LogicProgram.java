@@ -1,6 +1,10 @@
 package ilpme.entities;
 
 import java.util.ArrayList;
+import java.util.Collection;
+
+import org.apache.commons.lang3.StringUtils;
+
 import ilpme.xhail.core.terms.Clause;
 
 public class LogicProgram {
@@ -25,6 +29,13 @@ public class LogicProgram {
 	public LogicProgram(Clause[] generalization) {
 		this.program = new ArrayList<Clause>();
 		for(Clause rule : generalization){
+			this.program.add(rule);
+		}
+	}
+
+	public LogicProgram(Collection<Clause> lp) {
+		this.program = new ArrayList<Clause>();
+		for(Clause rule : lp){
 			this.program.add(rule);
 		}
 	}
@@ -65,8 +76,13 @@ public class LogicProgram {
 	}
 
 	public int length() {
-		// TODO Auto-generated method stub
+		
 		return this.program.size();
+	}
+
+	@Override
+	public String toString() {
+		return StringUtils.join(this.program, "\n");
 	}
 	
 	

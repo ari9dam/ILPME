@@ -20,6 +20,7 @@ import ilpme.entities.ILPMEProblem;
 import ilpme.entities.LogicProgram;
 import ilpme.utils.IPartialHypothesisPool;
 import ilpme.utils.PartialHypotheisQueue;
+import ilpme.utils.SatisfiabilityUtils;
 import ilpme.xhail.core.entities.Answers;
 
 /**
@@ -27,7 +28,7 @@ import ilpme.xhail.core.entities.Answers;
  * @author Arindam
  *
  */
-public class Application implements Callable<LogicProgram> {
+public class ILPMEApplication implements Callable<LogicProgram> {
 
 	static {
 		Answers.started();
@@ -99,19 +100,23 @@ public class Application implements Callable<LogicProgram> {
 				case "--mute":
 					builder.setMute(true);
 					break;
+				case "-l":
+				case "--maxLength":
+					builder.setMaxLength(args[++i]);
+					break;
 				case "--source":
 					builder.setSource(args[++i]);
 				}
 
 		
 		ILPMEConfig config = builder.build();
-		Application application = new Application(config);
+		ILPMEApplication application = new ILPMEApplication(config);
 		application.execute();
 	}
 
 	private ILPMEConfig config = null;
 	private ILPMEProblem problem = null;
-	private Application(ILPMEConfig config) {
+	private ILPMEApplication(ILPMEConfig config) {
 		if (null == config)
 			throw new IllegalArgumentException("Illegal 'config' argument in Application(Config): " + config);
 
@@ -128,8 +133,11 @@ public class Application implements Callable<LogicProgram> {
 		 */
 		this.problem = new ILPMEProblem(config);
 		IPartialHypothesisPool queue = new PartialHypotheisQueue();
-		IIterativeSolver iterSolver = new TopDownIterativeSolver();
-		IncrementalIterativeLearning iil = new IncrementalIterativeLearning(queue, iterSolver);
+		SatisfiabilityUtils asp = new SatisfiabilityUtils(problem.getConfig().getGringo().toAbsolutePath().toString(), 
+				problem.getConfig().getClasp().toAbsolutePath().toString());
+		IIterativeSolver iterSolver = new TopDownIterativeSolver(asp);
+		IncrementalIterativeLearning iil = new IncrementalIterativeLearning(queue, 
+				iterSolver, asp);
 		return iil.learn(problem);
 	}
 
@@ -160,6 +168,7 @@ public class Application implements Callable<LogicProgram> {
 			Logger.message(String.format("*** Info  (%s): computation was cancelled", Logger.SIGNATURE));
 		} catch (ExecutionException e) {
 			Logger.message(String.format("*** Info  (%s): computation threw an exception", Logger.SIGNATURE));
+			e.printStackTrace();
 		} catch (InterruptedException e) {
 			Logger.message(String.format("*** Info  (%s): current thread was interrupted while waiting", Logger.SIGNATURE));
 		} catch (TimeoutException e) {
@@ -171,6 +180,7 @@ public class Application implements Callable<LogicProgram> {
 				message += "\n    " + element.toString();
 			Logger.error(message);
 		} finally {
+			
 			service.shutdownNow();
 		}
 
