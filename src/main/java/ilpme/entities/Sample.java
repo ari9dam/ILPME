@@ -7,8 +7,10 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.nio.file.Path;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -25,7 +27,7 @@ import ilpme.xhail.core.statements.Display;
  * in the training data.
  * The training data is a collection of such samples.
  */
-public class Sample {
+public class Sample  implements Comparable<Sample>{
 	
 	/***
 	 * The properties of a Sample Observation
@@ -40,6 +42,7 @@ public class Sample {
 	
 	private String name="NONAME";
 	
+	private Set<PartialHypotheis> generalizations = null;
 	
 	public Sample(Path source){
 		/**
@@ -134,7 +137,8 @@ public class Sample {
 	public String toASPStringForSatisfiability() {
 		String obs = "%story\n "+ StringUtils.join(this.story,"\n")+"\n%examples\n";
 		for (Example example :this.getExamples())
-			obs+=example.asClauses()[2]+"\n";
+			if(!example.isDefeasible())
+				obs+=example.asClauses()[2]+"\n";
 		return obs;
 	}
 
@@ -150,6 +154,22 @@ public class Sample {
 	public String toString() {
 		return "Sample [ name=" + name+", story=" + story + ", displays=" + displays + ", domains=" + domains + ", examples=" + examples
 				 + "]";
+	}
+
+	@Override
+	public int compareTo(Sample arg) {
+		
+		return Integer.compare(Integer.parseInt(this.name.substring(0, this.name.indexOf('.')
+				)), Integer.parseInt(arg.name.substring(0, arg.name.indexOf('.'))));
+	}
+
+	public Set<PartialHypotheis> getGeneralizations() {
+		return generalizations;
+	}
+
+	public void setGeneralizations(Set<PartialHypotheis> generalizations) {
+		this.generalizations = new HashSet<>();
+		this.generalizations.addAll(generalizations);
 	}
 	
 }

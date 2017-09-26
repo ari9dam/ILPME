@@ -161,8 +161,10 @@ public class ILPMEApplication implements Callable<LogicProgram> {
 		
 		long kill = config.getKill();
 		try {
+			long time = System.currentTimeMillis();
 			final Future<LogicProgram> task = service.submit(this);
 			LogicProgram answer = kill > 0L ? task.get(kill, TimeUnit.SECONDS) : task.get();
+			System.out.println("Time in minutes: "+ (System.currentTimeMillis()-time+0.0)/60000);
 			Logger.stamp(answer);
 		} catch (CancellationException e) {
 			Logger.message(String.format("*** Info  (%s): computation was cancelled", Logger.SIGNATURE));

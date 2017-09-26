@@ -373,8 +373,8 @@ public class Problem implements Solvable {
 		// // result.add("#show use_clause_literal/2.");
 		for (Display display : displays)
 			result.add(String.format("#show %s/%d.", display.getIdentifier(), display.getArity()));
-		for (Example example : examples)
-			result.add(String.format("#show %s/%d.", example.getAtom().getIdentifier(), example.getAtom().getArity()));
+		//for (Example example : examples)
+		//	result.add(String.format("#show %s/%d.", example.getAtom().getIdentifier(), example.getAtom().getArity()));
 		for (ModeH mode : this.modeDeclarations.getAllModeHs()) {
 			Scheme scheme = mode.getScheme();
 			result.add(String.format("#show %s/%d.", scheme.getIdentifier(), scheme.getArity()));

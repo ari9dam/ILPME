@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -47,6 +48,7 @@ public class ILPMEProblem {
 				Logger.warning(false, "Ignoring file with unknown extension "+ file.getName());
 			}
 		}
+		Collections.sort(this.trainingData);
 		
 		this.modeDeclarations = builder.build();
 	}

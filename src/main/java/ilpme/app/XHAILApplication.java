@@ -121,8 +121,7 @@ public class XHAILApplication {
 			Set<Atom> selected = parseAllSelected(entry);
 			PartialHypotheis p  = new PartialHypotheis(ph.getGeneralization(),
 					selected, ph.getPoolSize());
-			p.setCoverage(ph.getCoverage()+1);
-			p.setIndex(ph.getIndex()+1);
+			
 			p.setSamples(ph.getSamples());
 			sol.add(p);
 		}

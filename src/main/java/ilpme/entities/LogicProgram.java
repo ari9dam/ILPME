@@ -9,7 +9,7 @@ import ilpme.xhail.core.terms.Clause;
 
 public class LogicProgram {
 	private ArrayList<Clause> program;
-
+	Integer size = null;
 	public LogicProgram() {
 		this.program = new ArrayList<Clause>();
 	}
@@ -76,8 +76,13 @@ public class LogicProgram {
 	}
 
 	public int length() {
-		
-		return this.program.size();
+		if(this.size!=null)
+			return size;
+		size=0;
+		for(Clause rule:this.getRules()){
+			size+= rule.getBody().length+1;
+		}
+		return size;
 	}
 
 	@Override

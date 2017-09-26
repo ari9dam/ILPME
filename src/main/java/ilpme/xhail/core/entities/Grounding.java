@@ -369,13 +369,18 @@ public class Grounding implements Solvable {
 							Set<Term> usables = new HashSet<>(substitutes);
 							Set<Term> used = new HashSet<Term>();
 							Set<Term> next = new HashSet<Term>();
-							while (!usables.isEmpty()) {
+							Set<Atom> added = new HashSet<Atom>();
+							do{
 								level += 1;
 								for (ModeB mode : problem.getModeBs(head)) {
 									scheme = mode.getScheme();
 									if (mode.isNegated()) {
 										Map<Atom, Collection<Term>> found = SchemeTerm.generateAndOutput(scheme, usables, table, facts);
 										for (Atom atom : found.keySet()) {
+											if(added.contains(atom)) 
+												continue;
+											added.add(atom);
+											
 											builder.addLiteral(new Literal.Builder( //
 													new Atom.Builder(atom).setWeight(mode.getWeigth()).setPriority(mode.getPriority()).build() //
 											).setNegated(mode.isNegated()).setLevel(level).build());
@@ -383,19 +388,26 @@ public class Grounding implements Solvable {
 										}
 									} else {
 										Map.Entry<Collection<Atom>, Collection<Term>> found = SchemeTerm.matchAndOutput(scheme, table.get(scheme), usables);
-										for (Atom atom : found.getKey())
+										for (Atom atom : found.getKey()){
+											if(added.contains(atom)) 
+												continue;
+											added.add(atom);
+											
 											builder.addLiteral(new Literal.Builder( //
 													new Atom.Builder(atom).setWeight(mode.getWeigth()).setPriority(mode.getPriority()).build() //
 											).setNegated(mode.isNegated()).setLevel(level).build());
+										}
 										next.addAll(found.getValue());
 									}
 								}
-								used.addAll(usables);
 								next.removeAll(used);
-								usables.clear();
+								//usables.clear();
 								usables.addAll(next);
+								if(next.isEmpty())
+									break;
+								used.addAll(next);
 								next.clear();
-							}
+							}while (true);
 						}
 						set.add(builder.build());
 					}
