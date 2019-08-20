@@ -19,8 +19,9 @@ The rest of the parameters are optional and provides controls over the search al
 --width         : the search algorthm is an backtracking algorithm. This option limits the size of pool of candidate partial solutions. When omitted no such bound is enforced.
 
 This parameters can significantly boost the runtime. So, it's better to use some of them, than to avoid it. Here is a sample run command for the [sample-input](https://drive.google.com/open?id=1N8NdWI1vuMCmnAH5nJjilfSf6uqqtiTt):
-
+```
 java -jar ilpme.jar -c C:\Users\Arindam\Downloads\clingo-3.0.5-win64\clasp.exe -g C:\Users\Arindam\Downloads\clingo-3.0.5-win64\gringo.exe --source "C:\Users\Arindam\Desktop\sample-input"  --width 1 --refinement 1
+```
 
 The code on my desktop produces the following output:
 
