@@ -8,8 +8,8 @@ Running the code
 To run either checkout the code from git and run with Eclpise or any Java IDE  or download the JAR file from here: [ilpme.jar](https://drive.google.com/open?id=1rTd6jdnWj2JsA48PS2G4WIsUsd__MmeE)
 
 The executable has the following parameters:
-- --clasp   : the path to the clasp executable. Download the required version from here [clingo-3.0.5](https://drive.google.com/open?id=16iCoPvvtP90Fv6eAn9ecOvRMOadSDvVj) 
-- --gringo  : the path to the gringo executable. Download the required version from here [clingo-3.0.5](https://drive.google.com/open?id=16iCoPvvtP90Fv6eAn9ecOvRMOadSDvVj) 
+- --clasp  (-c) : the path to the clasp executable. Download the required version from here [clingo-3.0.5](https://drive.google.com/open?id=16iCoPvvtP90Fv6eAn9ecOvRMOadSDvVj) 
+- --gringo (-g) : the path to the gringo executable. Download the required version from here [clingo-3.0.5](https://drive.google.com/open?id=16iCoPvvtP90Fv6eAn9ecOvRMOadSDvVj) 
 - --source  : the path to the directory that contains the training data. The directory should contain the .sample files, normally one for                 each  of training data sample; one or more .bk files containing common knowledge about the task and one or more .m (mode)                   files. You can download one sample source folder from here: [sample-input](https://drive.google.com/open?id=1N8NdWI1vuMCmnAH5nJjilfSf6uqqtiTt) . The .bk files contain normal asp programs. The .sample and .m               files uses #example, #modeb, #modeh directives, the meaning and syntax of which is described here: [xhail readme](https://github.com/stefano-bragaglia/XHAIL)   
 
 The rest of the parameters are optional and provides controls over the search algorithm. Let's say that the program has found a solution **H** for the first n samples and trying to extend the solution to **H'** that also overs the n+1-th sample. The parameters then plays the provides the following flexibility:
